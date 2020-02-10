@@ -1,26 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
-const App = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import createWorker from "workerize-loader!./worker" // import the module
+import * as Worker from "./worker"; // import the types
+
+const workerMessage = (async ():Promise<string> => {
+  const worker = createWorker<typeof Worker>();
+  return await worker.getMessage();
+})();
+
+function App() {
+  const [message, setMessage] = useState("...");
+  workerMessage.then(x => setMessage(x));
+  return <div className="App">Worker says "{message}"</div>;
 }
 
 export default App;
